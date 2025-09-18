@@ -1,3 +1,5 @@
 openai-agents
 fastmcp
 python-dotenv
+fastapi
+uvicorn

@@ -1,13 +1,26 @@
 import os
 import asyncio, sys
-from agents import Agent, Runner
+from fastapi import FastAPI
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from agents import Agent, Runner
 from agents.mcp.server import MCPServerStdio
 
 load_dotenv()
 
-async def main():
+app = FastAPI(title="Accurate AI")
 
+class ChatMessage(BaseModel):
+    message: str
+    session: str
+
+chat = None
+agent = None
+session = None
+
+async def init():
+
+    global agent, session
     server_path = os.path.join(os.path.dirname(__file__), "server.py")
 
     mcp_server = MCPServerStdio(
@@ -19,11 +32,8 @@ async def main():
     )
     
     try:
-        # Connect to the MCP server
-        print("Connecting to MCP server...")
         await mcp_server.connect()
         
-        # Create the agent with our MCP server
         agent = Agent(
             name="Database Agent",
             model="gpt-4.1-nano",
@@ -69,23 +79,33 @@ async def main():
             Always be helpful and provide clear responses about the database data.""",
             mcp_servers=[mcp_server]
         )
-        
-        print("Agent created successfully!")
 
-        ins = input("Enter your query: ")
-
-        print("Agent is thinking...")
-        result = await Runner.run(agent, ins)
-
-        print(f"\nAgent: {result.final_output}")
+        return True
             
     except Exception as e:
-        print(f"Error: {e}")
-    finally:
-        # Clean up
-        print("\nCleaning up...")
-        await mcp_server.cleanup()
+        print(f"Error initializing agent: {e}")
+        return False
+
+@app.on_event("startup")
+async def startups():
+    await init()
+
+@app.post("/chat")
+async def chat(chat: ChatMessage):
+    global agent, session
+    if not agent:
+        return {"error": "Agent not initialized"}
+    
+    try:
+        result = await Runner.run(agent, chat.message)
+        return {"response": result.final_output}
+    except Exception as e:
+        return {"error": str(e)}
+
+@app.get("/")
+async def root():
+    return {"message": "Accurate AI is running"}
 
 if __name__ == "__main__":
-    print("Starting Database Agent...")
-    asyncio.run(main())
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
