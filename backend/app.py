@@ -25,13 +25,13 @@ app = FastAPI(title="Accurate AI", lifespan=lifespan)
 async def init():
     global agent
 
-    server_path = os.path.join(os.path.dirname(__file__), "server.py")
+    server = os.path.join(os.path.dirname(__file__), "server.py")
 
     dbmcp = MCPServerStdio(
         name="Accurate DB Server",
         params={
             "command": sys.executable,
-            "args": [server_path, "--server_type=stdio"]
+            "args": [server, "--server_type=stdio"]
         }
     )
     
