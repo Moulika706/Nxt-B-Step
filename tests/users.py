@@ -1,43 +1,39 @@
 import sqlite3
 
-def add_users():
+def populate_users_table():
     file = 'accurate.db'
-    script = """
-    PRAGMA foreign_keys = ON;
-
-    CREATE TABLE IF NOT EXISTS users (
-        userid TEXT PRIMARY KEY,
-        name TEXT NOT NULL,
-        role TEXT NOT NULL CHECK (role IN ('admin', 'company', 'subject'))
-    );
-    """
+    
+    users = [
+        ('8899', 'Amazon Salesforce', 'company'),
+    ]
     
     try:
         with sqlite3.connect(file) as connection:
             print(f"Successfully connected to SQLite database '{file}'")
             cursor = connection.cursor()
-            cursor.executescript(script)
-            print("Users table created successfully.")
             
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='users';")
-            table_exists = cursor.fetchone()
-            if table_exists:
-                print("Users table confirmed in database.")
-                
-                cursor.execute("PRAGMA table_info(users);")
-                columns = cursor.fetchall()
-                print("Users table schema:")
-                
-                for col in columns:
-                    print(f"  - {col[1]} ({col[2]})")
+            cursor.executemany(
+                "INSERT OR REPLACE INTO users (userid, name, role) VALUES (?, ?, ?)",
+                users
+            )
             
+            print(f"Successfully inserted {len(users)} users into the users table.")
+            
+            cursor.execute("SELECT * FROM users ORDER BY role, userid;")
+            users = cursor.fetchall()
+            print("\nUsers table contents:")
+            print("UserID | Name | Role")
+            print("-" * 40)
+            for user in users:
+                print(f"{user[0]} | {user[1]} | {user[2]}")
+                
             connection.commit()
             
     except sqlite3.Error as e:
         print(f"Database error occurred: {e}")
         raise
         
-    print("Users table setup complete.")
+    print("\nUsers table population complete.")
 
 if __name__ == '__main__':
-    add_users() 
+    populate_users_table() 

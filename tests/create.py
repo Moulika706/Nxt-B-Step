@@ -5,6 +5,12 @@ def crds():
     script = """
     PRAGMA foreign_keys = ON;
 
+    CREATE TABLE IF NOT EXISTS users (
+        userid TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (role IN ('admin', 'company', 'subject'))
+    );
+
     CREATE TABLE IF NOT EXISTS company (
         comp_id INTEGER PRIMARY KEY,
         comp_name TEXT,
