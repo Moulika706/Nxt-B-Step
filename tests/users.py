@@ -1,10 +1,10 @@
 import sqlite3
 
-def populate_users_table():
+def populate():
     file = 'accurate.db'
     
     users = [
-        ('8899', 'Amazon Salesforce', 'company'),
+        ('8899', 'Amazon Salesforce', 'company', 'itsbharathajjarapu@gmail.com'),
     ]
     
     try:
@@ -36,4 +36,4 @@ def populate_users_table():
     print("\nUsers table population complete.")
 
 if __name__ == '__main__':
-    populate_users_table() 
+    populate() 

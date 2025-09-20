@@ -8,7 +8,8 @@ def crds():
     CREATE TABLE IF NOT EXISTS users (
         userid TEXT PRIMARY KEY,
         name TEXT NOT NULL,
-        role TEXT NOT NULL CHECK (role IN ('admin', 'company', 'subject'))
+        role TEXT NOT NULL CHECK (role IN ('admin', 'company', 'subject')),
+        email TEXT UNIQUE
     );
 
     CREATE TABLE IF NOT EXISTS company (
