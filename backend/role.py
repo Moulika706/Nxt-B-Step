@@ -148,8 +148,10 @@ async def init():
 @app.post("/chat")
 async def chat(chat: ChatMessage):
     global agent
-    sesspath = os.path.join(os.path.dirname(__file__), "sessions", f"{chat.sessionid}.db")
-    session = SQLiteSession(chat.sessionid, sesspath)
+    sesspath = os.path.join(os.path.dirname(__file__), "sessions")
+    os.makedirs(sesspath, exist_ok=True)
+    sqpath = os.path.join(sesspath, f"{chat.sessionid}.db")
+    session = SQLiteSession(chat.sessionid, sqpath)
     if not agent:
         return {"error": "Agent not initialized"}
     try:
