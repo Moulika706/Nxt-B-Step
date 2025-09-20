@@ -1,7 +1,7 @@
 import requests
 import json
 
-u = "http://localhost:8000/chat"
+u = "https://ac-teamx.onrender.com/chat"
 sessionid = "sessions1"
 userid = "8899"
 
@@ -16,7 +16,7 @@ while True:
         "userid": userid
     }
     try:
-        r = requests.post(u, data=json.dumps(b), headers={"Content-Type": "application/json"})
+        r = requests.post(u, json=b)
         response = r.json()
         print("Bot:", response.get("response", response.get("error", "No response")))
     except Exception as e:
