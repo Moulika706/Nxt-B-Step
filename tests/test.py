@@ -1,7 +1,7 @@
 import requests
 import json
 
-u = "http://localhost:8000/chat"
+u = "https://ac-teamx.onrender.com/chat"
 sessionid = "sessions1"
 userid = "8899"
 
