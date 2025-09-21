@@ -1152,7 +1152,7 @@ export default function AnimatedAIChat() {
                       onKeyDown={handleKeyDown}
                       onFocus={() => setInputFocused(true)}
                       onBlur={() => setInputFocused(false)}
-                      placeholder="Ask mvp.ai a question..."
+                      placeholder="Ask a question..."
                       containerClassName="w-full"
                       className={cn(
                         "w-full px-3 py-2.5 sm:px-4 sm:py-3",

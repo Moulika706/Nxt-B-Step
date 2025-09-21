@@ -6,7 +6,7 @@ from mcp.server.fastmcp import FastMCP
 mcp = FastMCP("Accurate DB Server")
 
 def getconn():
-    dbpath = os.path.join(os.path.dirname(__file__), "accurates.db")
+    dbpath = os.path.join(os.path.dirname(__file__), "accurate.db")
     conn = sqlite3.connect(dbpath)
     conn.row_factory = sqlite3.Row
     return conn

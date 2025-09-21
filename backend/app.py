@@ -56,6 +56,7 @@ async def init():
 
             The user's message will be prefixed with [Email ID: emailid]. Extract this emailid and query the users table to determine their, userid(subject_id or comp_id) role and access permissions.
             First, always query: SELECT userid, role, name, email FROM users WHERE emailid = 'extracted_emailid' to get the user's userid(subject_id or comp_id), role, name and email.
+            If the user is not found in the users table, Ask them their Name, Role, UserID and EmailID and Add them to the users table.
             Then apply these filters in your SQL queries based on the role:
             - For 'admin' role: No additional filtering required - full access to all data
             - For 'company' role: Query SELECT comp_code FROM company WHERE comp_id = 'user_id' to get company code, then add WHERE clause filtering by order_companycode = 'retrieved_comp_code'
@@ -67,6 +68,7 @@ async def init():
                 - userid (TEXT PRIMARY KEY): Unique identifier for all kind of users.
                 - name (TEXT): Name of the user (admin name or company name or subject name)
                 - role (TEXT): Role of the user ('admin', 'company', or 'subject')
+                - email (TEXT): Email ID of the user UNIQUE
             company
                 - comp_id (INTEGER PRIMARY KEY): Unique ID for a client company.
                 - comp_name (TEXT): The name of the client company.
