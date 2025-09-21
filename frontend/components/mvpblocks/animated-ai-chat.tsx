@@ -22,11 +22,10 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import * as React from "react"
-import { useAuth } from '@clerk/nextjs'
+import { useAuth, useUser } from '@clerk/nextjs'
 import { AuthButtons } from '@/components/auth/auth-buttons'
 import { AuthPopup } from '@/components/auth/auth-popup'
 import ChartRenderer from '@/components/ui/chart-renderer'
-import testChartsData from '@/data/test-charts.json'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -153,6 +152,7 @@ interface ChatSession {
 
 export default function AnimatedAIChat() {
   const { isSignedIn } = useAuth()
+  const { user } = useUser()
   const [value, setValue] = useState("")
   const [attachments, setAttachments] = useState<string[]>([])
   const [isPending, startTransition] = useTransition()
@@ -562,7 +562,7 @@ export default function AnimatedAIChat() {
           body: JSON.stringify({
             message: value.trim(),
             sessionid: isSignedIn ? currentChatId : "session123",
-            userid: "8899"  // Hardcoded userid as requested
+            userid: isSignedIn && user?.emailAddresses?.[0]?.emailAddress ? user.emailAddresses[0].emailAddress : "8899"  // Use email when signed in, hardcoded for guest
           })
         })
           .then(response => response.json())
@@ -676,7 +676,7 @@ export default function AnimatedAIChat() {
           body: JSON.stringify({
             message: postMessageValue.trim(),
             sessionid: isSignedIn ? currentChatId : "session123",
-            userid: "8899"  // Hardcoded userid as requested
+            userid: isSignedIn && user?.emailAddresses?.[0]?.emailAddress ? user.emailAddresses[0].emailAddress : "8899"  // Use email when signed in, hardcoded for guest
           })
         })
           .then(response => response.json())
