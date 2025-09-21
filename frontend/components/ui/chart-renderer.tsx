@@ -244,7 +244,7 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ chartData }) => {
               cy="50%"
               labelLine={false}
               label={({ name, percent }: any) => `${name} ${(percent * 100).toFixed(0)}%`}
-              outerRadius={80}
+              outerRadius={96}
               fill={colors[0]}
               dataKey="value"
             >
@@ -316,7 +316,7 @@ const ChartRenderer: React.FC<ChartRendererProps> = ({ chartData }) => {
         </motion.h3>
       )}
       <motion.div
-        className="w-full h-96"
+        className="w-full h-[360px] md:h-[400px] lg:h-[440px] xl:h-[480px]"
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.4 }}

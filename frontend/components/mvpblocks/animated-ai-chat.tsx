@@ -167,6 +167,7 @@ export default function AnimatedAIChat() {
   const [showAuthPopup, setShowAuthPopup] = useState(false)
   const [isGuestMode, setIsGuestMode] = useState(false)
   const [isThinking, setIsThinking] = useState(false)
+  const [followupQuestions, setFollowupQuestions] = useState<string[]>([])
   const postTextareaRef = useRef<HTMLTextAreaElement>(null)
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 60,
@@ -324,12 +325,11 @@ export default function AnimatedAIChat() {
   }
 
   const suggestedQuestions = [
-    "Show me a sales chart by region",
-    "Display revenue growth trends",
-    "Create a market share visualization",
-    "Generate customer satisfaction data",
-    "What are the latest trends in AI?",
-    "How does machine learning work?",
+    "What types of background checks are most common? (bar chart)",
+    "Show me the distribution of order statuses (pie chart)",
+    "What are the most popular background check packages? (bar chart)",
+    "Which states have the most background check requests? (bar chart)", 
+    "Show me the revenue distribution by company (pie chart)",
   ]
 
   const commandSuggestions: CommandSuggestion[] = [
@@ -401,6 +401,7 @@ export default function AnimatedAIChat() {
     setHasFirstMessage(false)
     setValue("")
     setPostMessageValue("")
+    setFollowupQuestions([])
     setSidebarOpen(false)
   }
 
@@ -418,6 +419,7 @@ export default function AnimatedAIChat() {
       setHasFirstMessage(selectedSession.messages.length > 0)
       setValue("")
       setPostMessageValue("")
+      setFollowupQuestions([])
       setSidebarOpen(false)
     }
   }
@@ -428,6 +430,7 @@ export default function AnimatedAIChat() {
     setHasFirstMessage(false)
     setValue("")
     setPostMessageValue("")
+    setFollowupQuestions([])
     setCurrentChatId("")
   }
 
@@ -567,8 +570,14 @@ export default function AnimatedAIChat() {
         })
           .then(response => response.json())
           .then(data => {
-            // Process response which might contain chart data in markdown
-            const responseText = data.response || "Sorry, I couldn't process that request."
+            // Handle the actual API response structure - API returns 'message' field
+            let responseText = data.message || data.response || "Sorry, I couldn't process that request.";
+            let followup = data.followup || [];
+            
+            // Extract followup questions if present
+            if (followup.length > 0) {
+              setFollowupQuestions(followup)
+            }
             
             // Check if response contains chart data - handle both escaped and unescaped backticks
             // The API might return either ```chart or \\`\\`\\`chart format
@@ -681,8 +690,14 @@ export default function AnimatedAIChat() {
         })
           .then(response => response.json())
           .then(data => {
-            // Process response which might contain chart data in markdown
-            const responseText = data.response || "Sorry, I couldn't process that request."
+            // Handle the actual API response structure - API returns 'message' field
+            let responseText = data.message || data.response || "Sorry, I couldn't process that request.";
+            let followup = data.followup || [];
+            
+            // Extract followup questions if present
+            if (followup.length > 0) {
+              setFollowupQuestions(followup)
+            }
             
             // Check if response contains chart data - handle both escaped and unescaped backticks
             // The API might return either ```chart or \\`\\`\\`chart format
@@ -949,7 +964,7 @@ export default function AnimatedAIChat() {
             >
               <div className="w-full h-full">
                 <div className="max-h-[calc(100vh-180px)] sm:max-h-[calc(100vh-200px)] overflow-y-auto w-full">
-                  <div className="mx-auto max-w-4xl px-4 sm:px-6 space-y-3 pb-1">
+                  <div className="mx-auto max-w-4xl lg:max-w-5xl xl:max-w-6xl px-4 sm:px-6 space-y-3 pb-1">
                     {messages.map((message, index) => (
                       <motion.div
                         key={message.id}
@@ -976,7 +991,7 @@ export default function AnimatedAIChat() {
                             "bg-card border border-gray-200 dark:border-gray-800 text-card-foreground",
                             "break-words overflow-wrap-anywhere",
                             message.chartData 
-                              ? "max-w-[95%] sm:max-w-[90%] md:max-w-[80%] lg:min-w-[500px]" 
+                              ? "max-w-[96%] sm:max-w-[92%] md:max-w-[88%] lg:max-w-[84%] xl:max-w-[80%] min-w-[480px] lg:min-w-[640px] xl:min-w-[720px]" 
                               : "max-w-[85%] sm:max-w-[80%]"
                           )}
                            style={{ 
@@ -1039,7 +1054,7 @@ export default function AnimatedAIChat() {
                           {message.text}
                            </ReactMarkdown>
                           {message.chartData && (
-                            <div className="mt-6 w-full min-w-[300px]">
+                            <div className="mt-6 w-full min-w-[480px] lg:min-w-[640px] xl:min-w-[720px]">
                               <ChartRenderer chartData={message.chartData} />
                             </div>
                           )}
@@ -1073,7 +1088,7 @@ export default function AnimatedAIChat() {
                 "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2",
               )}
             >
-              <div className="mx-auto w-full max-w-4xl">
+              <div className="mx-auto w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl">
                 <motion.div
                   className="space-y-3 text-center mb-6 sm:mb-8"
                   initial={{ opacity: 1 }}
@@ -1102,12 +1117,12 @@ export default function AnimatedAIChat() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4, duration: 0.5 }}
                 >
-                  <div className="flex flex-wrap gap-2 justify-center max-w-3xl mx-auto">
+                  <div className="flex flex-wrap gap-1 justify-center max-w-3xl mx-auto">
                     {suggestedQuestions.map((question, index) => (
                       <motion.button
                         key={index}
                         onClick={() => handleSuggestionClick(question)}
-                        className="px-4 py-2 rounded-full bg-card/30 backdrop-blur-xl border border-white/10 dark:border-white/5 hover:bg-card/50 hover:border-white/20 dark:hover:border-white/10 text-sm text-foreground transition-all duration-200 cursor-pointer"
+                        className="px-3 py-1.5 rounded-full bg-card/30 backdrop-blur-xl border border-white/10 dark:border-white/5 hover:bg-card/50 hover:border-white/20 dark:hover:border-white/10 text-xs text-foreground transition-all duration-200 cursor-pointer"
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.9 }}
@@ -1249,7 +1264,7 @@ export default function AnimatedAIChat() {
               exit={{ opacity: 0, y: 20 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
             >
-              <div className="mx-auto w-full max-w-4xl">
+              <div className="mx-auto w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl">
                 <motion.div
                   className="mb-2"
                   initial={{ opacity: 0, y: 10 }}
@@ -1257,9 +1272,9 @@ export default function AnimatedAIChat() {
                   transition={{ duration: 0.4, ease: "easeOut" }}
                 >
                   <div className="overflow-x-auto scrollbar-hide">
-                    {/* Reduced gap from gap-2 to gap-1.5 and padding from pb-2 to pb-1 */}
-                    <div className="flex gap-1.5 pb-1 min-w-max">
-                      {suggestedQuestions.map((question, index) => (
+                    {/* Reduced gap to gap-1 and smaller padding for compact layout */}
+                    <div className="flex gap-1 pb-1 min-w-max">
+                      {(followupQuestions.length > 0 ? followupQuestions : suggestedQuestions).map((question, index) => (
                         <motion.button
                           key={index}
                           onClick={() => {
@@ -1274,7 +1289,7 @@ export default function AnimatedAIChat() {
                               postTextareaRef.current.focus()
                             }
                           }}
-                          className="px-3 py-1.5 rounded-full bg-card/30 backdrop-blur-xl border border-white/10 dark:border-white/5 hover:bg-card/50 hover:border-white/20 dark:hover:border-white/10 text-xs text-foreground transition-all duration-200 cursor-pointer whitespace-nowrap flex-shrink-0"
+                          className="px-2 py-1 rounded-full bg-card/30 backdrop-blur-xl border border-white/10 dark:border-white/5 hover:bg-card/50 hover:border-white/20 dark:hover:border-white/10 text-xs text-foreground transition-all duration-200 cursor-pointer whitespace-nowrap flex-shrink-0"
                           initial={{ opacity: 0, scale: 0.9 }}
                           animate={{ opacity: 1, scale: 1 }}
                           exit={{ opacity: 0, scale: 0.9 }}
