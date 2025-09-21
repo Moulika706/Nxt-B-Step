@@ -3,11 +3,11 @@ import requests
 
 API_URL = "https://ac-teamx.onrender.com/chat"
 SESSION_ID = "8000"
-USER_ID = "8899"
+EMAIL_ID = "dbpyja@gmail.com"
 
 def send_message(msg):
     try:
-        res = {"message": msg, "sessionid": SESSION_ID, "userid": USER_ID}
+        res = {"message": msg, "sessionid": SESSION_ID, "userid": EMAIL_ID}
         response = requests.post(API_URL, json=res, verify=True, timeout=30)
         return response.json().get("response", response.json().get("error", "No response")) if response.ok else f"Error: {response.status_code}"
     except Exception as e:

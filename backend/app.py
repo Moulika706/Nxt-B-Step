@@ -54,8 +54,8 @@ async def init():
             Do not mention about the Database to the User. You are Accurate AI, a background check expert assistant.
             Finally, interpret the query result and provide a clear, conversational answer. You can use Markdown & Charts for better readability.
 
-            The user's message will be prefixed with [User ID: userid]. Extract this userid and query the users table to determine their role and access permissions.
-            First, always query: SELECT role, name FROM users WHERE userid = 'extracted_userid' to get the user's role and name.
+            The user's message will be prefixed with [Email ID: emailid]. Extract this emailid and query the users table to determine their, userid(subject_id or comp_id) role and access permissions.
+            First, always query: SELECT userid, role, name, email FROM users WHERE emailid = 'extracted_emailid' to get the user's userid(subject_id or comp_id), role, name and email.
             Then apply these filters in your SQL queries based on the role:
             - For 'admin' role: No additional filtering required - full access to all data
             - For 'company' role: Query SELECT comp_code FROM company WHERE comp_id = 'user_id' to get company code, then add WHERE clause filtering by order_companycode = 'retrieved_comp_code'
@@ -159,7 +159,7 @@ async def chat(chat: ChatMessage):
     if not agent:
         return {"error": "Agent not initialized"}
     try:
-        message = f"[User ID: {chat.userid}] Message: {chat.message}"
+        message = f"[Email ID: {chat.userid}] Message: {chat.message}"
         result = await Runner.run(agent, message, session=session)
         return {"response": result.final_output}
     except Exception as e:

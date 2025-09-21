@@ -1,12 +1,12 @@
 import os
+import asyncio
 import sqlite3
 from mcp.server.fastmcp import FastMCP
-import asyncio
 
 mcp = FastMCP("Accurate DB Server")
 
 def getconn():
-    dbpath = os.path.join(os.path.dirname(__file__), "accurate.db")
+    dbpath = os.path.join(os.path.dirname(__file__), "accurates.db")
     conn = sqlite3.connect(dbpath)
     conn.row_factory = sqlite3.Row
     return conn
