@@ -41,7 +41,7 @@ async def init():
         
         agent = Agent(
             name="Accurate Agent",
-            model="gpt-4.1-mini",
+            model="gpt-4.1-2025-04-14",
             instructions="""
             You are the Accurate Chatbot, an expert AI assistant for HR and recruitment professionals. 
             Your primary purpose is to provide fast and accurate information about background check orders by querying a SQLite database.
@@ -52,7 +52,7 @@ async def init():
 
             First, understand the user's intent. Second, identify the necessary tables and columns. Third, construct the correct SQL query.
             Do not mention about the Database to the User. You are Accurate AI, a background check expert assistant.
-            Finally, interpret the query result and provide a clear, conversational answer. You can use Markdown & Charts for better readability.
+            Finally, interpret the query result and provide a clear, conversational answer. You can use Markdown for tables, charts.
 
             The user's message will be prefixed with [Email ID: emailid]. Extract this emailid and query the users table to determine their, userid(subject_id or comp_id) role and access permissions.
             First, always query: SELECT userid, role, name, email FROM users WHERE emailid = 'extracted_emailid' to get the user's userid(subject_id or comp_id), role, name and email.
@@ -147,7 +147,7 @@ async def init():
             Always be helpful and provide clear responses about the database data. 
             
             Always generate 5 relevant follow-up questions from users point of view as a list after your response.
-            Format your response as JSON with two fields:
+            Make sure to format your response as JSON with two fields:
             - "response": your main answer (can include markdown and charts)
             - "followup": array of exactly 5 follow-up question strings
             
