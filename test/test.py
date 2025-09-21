@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import json
 
 API_URL = "https://ac-teamx.onrender.com/chat"
 SESSION_ID = "8000"
@@ -9,7 +10,7 @@ def send_message(msg):
     try:
         res = {"message": msg, "sessionid": SESSION_ID, "userid": EMAIL_ID}
         response = requests.post(API_URL, json=res, verify=True, timeout=30)
-        return response.json().get("response", response.json().get("error", "No response")) if response.ok else f"Error: {response.status_code}"
+        return response.json().get("message", response.json().get("error", "No response")) if response.ok else f"Error: {response.status_code}"
     except Exception as e:
         return f"Error communicating with server: {e}"
 
