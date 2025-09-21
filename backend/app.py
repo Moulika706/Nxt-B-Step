@@ -173,13 +173,20 @@ async def chat(chat: ChatMessage):
     try:
         message = f"[Email ID: {chat.userid}] Message: {chat.message}"
         result = await Runner.run(agent, message, session=session)
-        response_parts = result.final_output.split("Follow-up questions:")
-        main_response = response_parts[0].strip()
-        followup = []
-        if len(response_parts) > 1:
-            followup_text = response_parts[1].strip()
-            followup = [q.strip().lstrip('- ').lstrip('1234567890. ') for q in followup_text.split('\n') if q.strip()]
-        return {"response": main_response, "followup": followup}
+        try:
+            parsed = json.loads(result.final_output)
+            return {
+                "message": parsed.get("response", ""),
+                "followup": parsed.get("followup", [])
+            }
+        except json.JSONDecodeError:
+            response_parts = result.final_output.split("Follow-up questions:")
+            main_response = response_parts[0].strip()
+            followup = []
+            if len(response_parts) > 1:
+                followup_text = response_parts[1].strip()
+                followup = [q.strip().lstrip('- ').lstrip('1234567890. ') for q in followup_text.split('\n') if q.strip()]
+            return {"message": main_response, "followup": followup}
     except Exception as e:
         return {"error": str(e)}
 
