@@ -1,4 +1,5 @@
-# 🔍 Accurate AI - Background Check Management System
+# VNR-TEAMX - Agent A - Accurate AI Agent
+Hackathon Repo for VNR Team - Team X - [Deployed Link](https://agent-a-rho.vercel.app/) - [PPT](https://www.canva.com/design/DAGzncxT3ys/PEL-71baFXBPv771McgiFw/edit?utm_content=DAGzncxT3ys&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue.svg)](https://python.org)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black.svg)](https://nextjs.org)
@@ -7,74 +8,141 @@
 [![SQLite](https://img.shields.io/badge/SQLite-3.0-lightgrey.svg)](https://sqlite.org)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-3.4-blue.svg)](https://tailwindcss.com)
 
-## 📋 Table of Contents
-- [Project Overview](#-project-overview)
-- [Key Features](#-key-features)
-- [Technology Stack](#-technology-stack)
-- [System Architecture](#-system-architecture)
-- [Installation & Setup](#-installation--setup)
-- [Usage Guide](#-usage-guide)
-- [API Documentation](#-api-documentation)
-- [Database Schema](#-database-schema)
-- [Project Structure](#-project-structure)
-- [Development](#-development)
-- [Deployment](#-deployment)
-- [Contributing](#-contributing)
-- [License](#-license)
+## Table of Contents
+- [Project Overview](#project-overview)
+- [Installation & Setup](#installation--setup)
+- [Key Features](#key-features)
+- [Technology Stack](#technology-stack)
+- [System Architecture](#system-architecture)
+- [Usage Guide](#usage-guide)
+- [API Documentation](#api-documentation)
+- [Database Schema](#database-schema)
+- [Project Structure](#project-structure)
 
-## 🎯 Project Overview
+## Project Overview
 
-**Accurate AI** is an intelligent background check management system designed for HR professionals and recruitment agencies. The system provides an AI-powered chat interface that enables users to query comprehensive background check data through natural language conversations.
+**Agent A (Accurate Agent)** is an intelligent background check management system designed for HR professionals and recruitment agencies. This system combines modern web technologies (NextJS) with modern artificial intelligence technologies (MCP) to deliver fast, accurate insights about background verification processes, order statuses, and detailed search results across multiple data dimensions. Built as a hackathon project by Team X for Accurate Background, this system revolutionizes how HR teams interact with background check information.
 
-The platform combines modern web technologies with artificial intelligence to deliver fast, accurate insights about background verification processes, order statuses, and detailed search results across multiple data dimensions.
-
-### Core Problem Solved
-- **Complex Data Queries**: Traditional background check systems require SQL knowledge to extract meaningful insights
-- **Time-Consuming Analysis**: Manual data analysis slows down HR decision-making processes
-- **Limited Accessibility**: Background check data often exists in silos, making comprehensive analysis difficult
+### Core Problems Solved
+- **Complex Data Queries**: Traditional background check systems require In-Depth SQL knowledge
+- **Time-Consuming Analysis**: HR professionals spend hours manually analyzing background check data and generating insights
+- **Limited Accessibility**: Background check data often exists in silos across different systems, making cross-referencing difficult
+- **Inconsistent Reporting**: Different team members may generate inconsistent reports due to manual analysis processes
 
 ### Solution Approach
-- **Natural Language Interface**: Ask questions in plain English instead of writing complex SQL queries
-- **Role-Based Access**: Different user types (admin, company, subject) see only relevant data
-- **Intelligent Data Analysis**: AI automatically generates charts and visualizations from query results
-- **Real-Time Insights**: Instant access to background check statuses and detailed search results
+- **Natural Language Interface**: Ask complex questions in plain English instead of writing SQL queries or navigating complex interfaces
+- **Role-Based Access Control**: Different user types (admin, company, subject) see only relevant data with proper security boundaries
+- **Intelligent Data Analysis**: AI automatically generates charts, graphs, and insights from complex background check datasets
+- **Real-Time Insights**: Instant access to background check statuses, progress tracking, and detailed search results
+- **Personalized Ques**: The AI interface provides ready-to-use prompts personalized to user and reduces learning curve.
+- **Smart Follow-ups**: The agent intelligently suggests relevant next questions based on conversation context and data patterns
+- **Unified Data Access**: Single interface to access all background check information across different tables and relationships
+- **Modern Web Interface**: Intuitive, responsive design that works seamlessly across devices and browsers
 
-## ✨ Key Features
+## Installation & Setup
 
-### 🤖 AI-Powered Chat Interface
-- **Natural Language Processing**: Query background check data using conversational language
-- **Context-Aware Responses**: AI understands the background check lifecycle and provides relevant insights
-- **Automated Chart Generation**: Visual representations of data trends and distributions
-- **Follow-up Questions**: AI suggests relevant follow-up queries based on conversation context
+### Prerequisites
+- **Node.js** 18+ or **Bun** runtime
+- **Python** 3.8+
 
-### 🔐 Multi-Role Authentication System
-- **Admin Access**: Full system access with complete data visibility
-- **Company Access**: Limited to their organization's background check data
-- **Subject Access**: Personal background check information access
-- **Guest Mode**: Limited functionality for unauthenticated users
+### Backend Setup
 
-### 📊 Comprehensive Data Analytics
-- **Order Status Tracking**: Real-time visibility into background check progress
-- **Package Performance**: Analysis of different background check package effectiveness
-- **Geographic Distribution**: Location-based analysis of background check requests
-- **Search Type Analytics**: Performance metrics across different verification types
+1. **Navigate to Backend Directory**
+   ```bash
+   cd backend
+   ```
 
-### 🎨 Modern User Experience
-- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
-- **Smooth Animations**: Framer Motion powered interactions and transitions
-- **Dark/Light Theme**: Automatic theme switching based on user preference
-- **Chat History**: Persistent conversation history with search functionality
+2. **Create Virtual Environment**
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate I used Ubuntu
+   ```
 
-## 🛠 Technology Stack
+3. **Install Dependencies**
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-### Backend Technologies
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **Web Framework** | FastAPI | High-performance REST API with automatic OpenAPI documentation |
-| **AI Integration** | OpenAI Agents | Advanced conversational AI with tool calling capabilities |
-| **Database Protocol** | MCP (Model Context Protocol) | Standardized interface for AI-database interactions |
-| **Database** | SQLite | Lightweight, serverless database for development and testing |
-| **Environment** | Python 3.8+ | Backend runtime environment |
+4. **Environment Configuration**
+   Create `.env` file in backend directory:
+   ```env
+   OPENAI_API_KEY=your_openai_api_key_here
+   ```
+
+5. **Database Initialization**
+   ```bash
+   cd playground
+   python create.py  # Creates database schema
+   python users.py   # Populates user data
+   python adata.py   # Extra, Adds Completed Orders
+   cd ..
+   ```
+   Move the accurate.db file to backend folder
+
+6. **Start Backend Server**
+   ```bash
+   python app.py
+   ```
+   Backend will be available at `http://localhost:8000`
+   API will be available at `http://localhost:8000/chat`
+
+### Frontend Setup
+
+1. **Navigate to Frontend Directory**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install Dependencies**
+   ```bash
+   bun install  # or npm install
+   ```
+
+3. **Environment Configuration**
+   Create `.env.local` file:
+   ```env
+   # Clerk Authentication
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+   CLERK_SECRET_KEY=your_clerk_secret_key
+
+   # API Configuration
+   NEXT_PUBLIC_API_URL=http://localhost:8000
+   ```
+
+4. **Start Development Server**
+   ```bash
+   bun dev  # or npm run dev
+   ```
+   Frontend will be available at `http://localhost:3000`
+
+## Key Features
+
+### AI-Powered Chat Interface
+- **Natural Language Processing**: Query background check data using conversational language without any extra effort.
+- **Context-Aware Responses**: AI understands the background check lifecycle and provides relevant insights based on data.
+- **Intelligent Chart Generation**: Visual representations of data with support for various graphs and provides when needed
+- **Follow-up Questions**: AI suggests relevant follow-up queries based on conversation context and data patterns
+- **Multi-Table Query Support**: Seamlessly query across related tables (orders, subjects, companies, search results) without complex joins
+- **Intelligent Data Interpretation**: AI explains complex background check data in easy-to-understand business terms
+- **Historical Conversation Context**: Maintains conversation history to provide contextually relevant responses
+
+### Multi-Role Authentication System
+- **Admin Access**: Full system access with complete data visibility across all companies, subjects, and orders
+- **Company Access**: Limited to their organization's background check data with filtered views based on company codes
+- **Subject Access**: Personal background check information access with privacy-focused data restrictions
+- **Guest Mode**: Limited functionality for unauthenticated users to explore basic features
+- **Session Management**: Persistent sessions with proper authentication and secure data access
+- **Role-Based Data Filtering**: Automatic data filtering based on user role and permissions
+- **Audit Trail In Agent**: Track user activities and data access for developement
+
+### Comprehensive Data Analytics
+- **Order Status Tracking**: Real-time visibility into background check progress with completion percentages and timelines
+- **Package Performance**: Analysis of different background check package effectiveness and cost-performance ratios
+- **Geographic Distribution**: Location-based analysis of background check requests with state-wise and county-wise breakdowns
+- **Search Type Analytics**: Performance metrics across different verification types (MVR, Employment, Criminal, etc.)
+- **Trend Analysis**: Historical data analysis to identify patterns in background check completion times and success rates (works when prompted still need to work)
+
+## Technology Stack
 
 ### Frontend Technologies
 | Component | Technology | Purpose |
@@ -87,17 +155,32 @@ The platform combines modern web technologies with artificial intelligence to de
 | **Charts** | Recharts | Composable charting library for React |
 | **Authentication** | Clerk | Complete authentication and user management |
 
-### Development Tools
-| Tool | Purpose |
-|------|---------|
-| **Package Manager** | Bun | Fast JavaScript runtime and package manager |
-| **Build Tool** | Next.js | Optimized production builds |
-| **Type Checking** | TypeScript | Compile-time error detection |
-| **Linting** | ESLint | Code quality and consistency |
+### Backend Technologies
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Web Framework** | FastAPI | High-performance REST API with automatic OpenAPI documentation |
+| **AI Integration** | OpenAI Agents | Advanced conversational AI with tool calling capabilities |
+| **Database Protocol** | MCP (Model Context Protocol) | Standardized interface for AI-database interactions |
+| **Database** | SQLite | Lightweight, serverless database for development and testing |
+| **Environment** | Python 3.8+ | Backend runtime environment |
 
-## 🏗 System Architecture
+## System Architecture
 
 ### High-Level Architecture
+This diagram illustrates the overall system architecture, showing how different components interact with each other from the user interface down to the database layer. It demonstrates the complete data flow and access control mechanisms that enable secure, role-based interactions with the background check data.
+
+**Component Breakdown:**
+- **User Interface**: The entry point where users interact with the system through a web browser
+- **Next.js Frontend**: React-based frontend application handling user interactions and rendering the chat interface
+- **Clerk Authentication**: Third-party authentication service managing user registration, login, and session management
+- **FastAPI Backend**: High-performance Python web framework handling API requests and orchestrating AI interactions
+- **OpenAI Agent**: Advanced conversational AI that processes natural language queries and generates intelligent responses
+- **MCP Server**: Model Context Protocol server providing standardized database access tools for the AI agent
+- **SQLite Database**: Lightweight relational database storing all background check data with proper relationships
+- **Session Management**: Handles persistent chat sessions and conversation history
+- **Database Tables**: Core data entities including users, companies, subjects, orders, and search results
+- **Role-Based Access**: Security layer ensuring users only access data appropriate to their role (admin/company/subject)
+
 ```mermaid
 graph TB
     A[User Interface] --> B[Next.js Frontend]
@@ -131,6 +214,18 @@ graph TB
 ```
 
 ### Data Flow Architecture
+This sequence diagram shows the step-by-step flow of data through the system when a user interacts with the chat interface. It demonstrates how natural language input is processed through multiple layers to generate intelligent responses with proper authentication and data access controls.
+
+**Process Flow:**
+1. **User Input**: User submits a natural language query through the chat interface
+2. **Authentication Check**: Frontend validates user credentials via Clerk authentication service
+3. **API Request**: Authenticated request is sent to the FastAPI backend with user context
+4. **AI Processing**: OpenAI agent analyzes the query and determines required database operations
+5. **Tool Execution**: MCP server executes specific database tools (querydb, get_schema, get_tables)
+6. **Data Retrieval**: SQLite database returns requested background check information
+7. **Response Generation**: AI agent formats the data and generates natural language response
+8. **Display**: Frontend renders the response with any charts or visualizations
+
 ```mermaid
 sequenceDiagram
     participant U as User
@@ -156,6 +251,29 @@ sequenceDiagram
 ```
 
 ### Component Architecture
+This diagram shows the layered architecture of the system, separating concerns between the frontend presentation layer, backend logic layer, and data persistence layer. Each layer has specific responsibilities and communicates through well-defined interfaces.
+
+**Layer Descriptions:**
+
+**Frontend Layer (Presentation Layer):**
+- **Next.js App**: Main application container managing routing and state
+- **React Components**: Reusable UI components built with TypeScript for type safety
+- **Authentication**: Integration with Clerk for secure user authentication and session management
+- **Chat Interface**: Interactive chat component handling user input and displaying AI responses
+- **Chart Renderer**: Component responsible for rendering data visualizations using Recharts
+
+**Backend Layer (Logic Layer):**
+- **FastAPI Server**: High-performance web server handling HTTP requests and responses
+- **AI Agent**: OpenAI-powered conversational agent with custom instructions for background check domain
+- **MCP Protocol**: Model Context Protocol implementation providing database access tools
+- **Database Tools**: Specific tools for querying database, getting schemas, and listing tables
+
+**Data Layer (Persistence Layer):**
+- **SQLite Database**: File-based relational database storing all application data
+- **Schema Tables**: Structured tables with proper relationships and constraints
+- **Relationships**: Foreign key relationships ensuring data integrity
+- **Constraints**: Database-level constraints maintaining data consistency
+
 ```mermaid
 graph LR
     subgraph "Frontend Layer"
@@ -182,88 +300,7 @@ graph LR
     I --> J
 ```
 
-## 🚀 Installation & Setup
-
-### Prerequisites
-- **Node.js** 18+ or **Bun** runtime
-- **Python** 3.8+
-- **Git** for version control
-
-### Backend Setup
-
-1. **Navigate to Backend Directory**
-   ```bash
-   cd backend
-   ```
-
-2. **Create Virtual Environment**
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
-   ```
-
-3. **Install Dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Environment Configuration**
-   Create `.env` file in backend directory:
-   ```env
-   # OpenAI Configuration
-   OPENAI_API_KEY=your_openai_api_key_here
-
-   # Application Settings
-   DEBUG=True
-   HOST=0.0.0.0
-   PORT=8000
-   ```
-
-5. **Database Initialization**
-   ```bash
-   cd playground
-   python create.py  # Creates database schema
-   python users.py   # Populates user data
-   python adata.py   # Adds sample background check data
-   cd ..
-   ```
-
-6. **Start Backend Server**
-   ```bash
-   python app.py
-   ```
-   Backend will be available at `http://localhost:8000`
-
-### Frontend Setup
-
-1. **Navigate to Frontend Directory**
-   ```bash
-   cd frontend
-   ```
-
-2. **Install Dependencies**
-   ```bash
-   bun install  # or npm install
-   ```
-
-3. **Environment Configuration**
-   Create `.env.local` file:
-   ```env
-   # Clerk Authentication
-   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-   CLERK_SECRET_KEY=your_clerk_secret_key
-
-   # API Configuration
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   ```
-
-4. **Start Development Server**
-   ```bash
-   bun dev  # or npm run dev
-   ```
-   Frontend will be available at `http://localhost:3000`
-
-## 📖 Usage Guide
+## Usage Guide
 
 ### Getting Started
 1. **Access the Application**: Open `http://localhost:3000` in your browser
@@ -303,7 +340,7 @@ SELECT * FROM order_request WHERE order_companycode = 'ABC123'
 SELECT * FROM order_request WHERE order_subjectid = 12345
 ```
 
-## 🔌 API Documentation
+## API Documentation
 
 ### Chat Endpoint
 ```http
@@ -353,7 +390,7 @@ Content-Type: application/json
 // Returns array of table names
 ```
 
-## 🗄 Database Schema
+## Database Schema
 
 ### Core Tables
 
@@ -386,6 +423,34 @@ CREATE TABLE subject (
     subject_address1 TEXT,          -- Primary address
     subject_address2 TEXT,          -- Secondary address
     sbj_city TEXT                   -- City location
+);
+```
+
+#### Package Table
+```sql
+CREATE TABLE package (
+    package_code INTEGER PRIMARY KEY, -- Package ID
+    package_name TEXT,                 -- Package name
+    package_price REAL,                -- Package cost
+    comp_code TEXT,                    -- Company reference
+    FOREIGN KEY (comp_code) REFERENCES company(comp_code)
+);
+```
+
+#### Search Status Table
+```sql
+CREATE TABLE search_status (
+    status_code TEXT PRIMARY KEY,      -- Status code
+    status TEXT                        -- Status description
+);
+```
+
+#### Search Type Table
+```sql
+CREATE TABLE search_type (
+    search_type_code TEXT PRIMARY KEY, -- Search type code
+    search_type TEXT,                  -- Search type description
+    search_type_category TEXT          -- Search category
 );
 ```
 
@@ -426,6 +491,8 @@ CREATE TABLE search (
 ```
 
 ### Relationships
+This ER diagram shows the correct relationships between all database tables based on the actual schema defined in the system:
+
 ```mermaid
 erDiagram
     USERS ||--o{ ORDER_REQUEST : "manages"
@@ -438,6 +505,7 @@ erDiagram
     SUBJECT ||--o{ SEARCH : "searched"
     PACKAGE ||--o{ SEARCH : "includes"
     SEARCH_STATUS ||--o{ SEARCH : "updates"
+    COMPANY ||--o{ PACKAGE : "provides"
 
     USERS {
         TEXT userid PK
@@ -469,6 +537,17 @@ erDiagram
         TEXT comp_code FK
     }
 
+    SEARCH_STATUS {
+        TEXT status_code PK
+        TEXT status
+    }
+
+    SEARCH_TYPE {
+        TEXT search_type_code PK
+        TEXT search_type
+        TEXT search_type_category
+    }
+
     ORDER_REQUEST {
         INTEGER order_id PK
         TEXT order_packageid UK
@@ -491,11 +570,11 @@ erDiagram
     }
 ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
-achackz/
-├── backend/                 # Python FastAPI backend
+project/
+├── backend/                # Python FastAPI backend
 │   ├── agents/             # AI agent definitions
 │   ├── accurate.db         # SQLite database
 │   ├── app.py              # Main FastAPI application
@@ -515,100 +594,16 @@ achackz/
 │   ├── create.py           # Database schema creation
 │   ├── users.py            # User data population
 │   ├── adata.py            # Sample data insertion
+│   ├── migrate.py          # Excel to SQLite migration script
+│   ├── basetest.py         # Simple CLI chat test script
+│   ├── test.py             # Streamlit chatbot UI for testing
+│   ├── clean.py            # Data cleaning utilities
 │   └── dataset.xlsx        # Excel data source
 └── README.md               # This file
 ```
 
-## 💻 Development
+## Acknowledgments
 
-### Development Workflow
-1. **Backend Development**:
-   ```bash
-   cd backend
-   python app.py  # Start development server
-   ```
+Thanks for Team Accurate for a Great Hackathon Experience, and Working on Agent A was a Great Experience for all my Team.
 
-2. **Frontend Development**:
-   ```bash
-   cd frontend
-   bun dev        # Start Next.js development server
-   ```
-
-3. **Database Management**:
-   ```bash
-   cd playground
-   python create.py    # Initialize database
-   python users.py     # Add test users
-   python adata.py     # Populate sample data
-   ```
-
-### Code Organization
-- **Backend**: Modular FastAPI application with separate concerns
-- **Frontend**: Component-based React architecture with TypeScript
-- **Database**: Normalized schema with proper relationships and constraints
-- **Testing**: Unit tests for critical functionality
-
-## 🚀 Deployment
-
-### Production Deployment Checklist
-- [ ] Configure production environment variables
-- [ ] Set up production database
-- [ ] Configure SSL certificates
-- [ ] Set up monitoring and logging
-- [ ] Configure backup procedures
-- [ ] Set up CI/CD pipeline
-
-### Docker Deployment (Optional)
-```dockerfile
-# Backend Dockerfile
-FROM python:3.11-slim
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-COPY . .
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# Frontend Dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-RUN npm run build
-CMD ["npm", "start"]
-```
-
-## 🤝 Contributing
-
-We welcome contributions to Accurate AI! Please follow these guidelines:
-
-### Development Setup
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes following the existing code style
-4. Add tests for new functionality
-5. Submit a pull request with a clear description
-
-### Code Standards
-- **Backend**: Follow PEP 8 Python style guidelines
-- **Frontend**: Use TypeScript with strict mode enabled
-- **Commits**: Use conventional commit format
-- **Documentation**: Update README for significant changes
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **OpenAI** for providing the GPT-4 model and agents framework
-- **FastAPI** for the excellent web framework
-- **Next.js** for the powerful React framework
-- **Clerk** for authentication services
-- **Radix UI** for accessible component library
-
----
-
-**Accurate AI** - Transforming background check management through intelligent automation and natural language interfaces.
-
-For support or questions, please contact the development team or create an issue in the repository.
+For support or questions, please contact me via email @ [itsbharathajjarapu@gmail.com](mailto:itsbharathajjarapu@gmail.com).
