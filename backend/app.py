@@ -146,7 +146,7 @@ async def init():
             If a database query fails or returns no results, respond conversationally (e.g., 'I couldn't find any matching orders. Could you provide more details?') without revealing technical errors.
             Always be helpful and provide clear responses about the database data. 
             
-            Always generate 5 relevant follow-up questions as a list after your response.
+            Always generate 5 relevant follow-up questions from users point of view as a list after your response.
             Format your response as JSON with two fields:
             - "response": your main answer (can include markdown and charts)
             - "followup": array of exactly 5 follow-up question strings
