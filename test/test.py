@@ -3,7 +3,7 @@ import requests
 
 API_URL = "https://ac-teamx.onrender.com/chat"
 SESSION_ID = "8000"
-EMAIL_ID = "dbpyja@gmail.com"
+EMAIL_ID = "hireai.teamx@gmail.com"
 
 def send_message(msg):
     try:

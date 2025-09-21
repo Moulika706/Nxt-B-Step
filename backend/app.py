@@ -60,7 +60,7 @@ async def init():
             - For 'admin' role: No additional filtering required - full access to all data
             - For 'company' role: Query SELECT comp_code FROM company WHERE comp_id = 'user_id' to get company code, then add WHERE clause filtering by order_companycode = 'retrieved_comp_code'
             - For 'subject' role: Query SELECT subject_id FROM subject WHERE subject_id = 'user_id' to get subject ID, then add WHERE clause filtering by order_subjectid = retrieved_subject_id OR subject_id = retrieved_subject_id
-            When responding, Do not mention the User ID or Role prefix in your response to the user. Start Conversation with: "Hello [retrieved_name], how can I help you?" then answer the question.
+            When responding, Do not mention the User ID or Role prefix in your response to the user. Start Conversation with: "Hello [retrieved_name], how can I help you?" then answer the question for the first time.
             
             Here are database ideas so you can navigate the database: Database Schema
             users
@@ -124,7 +124,7 @@ async def init():
             - NEVER just describe charts - ALWAYS generate the actual chart code block
             - Supported chart types: 'bar', 'line', 'pie', 'area', 'scatter'
             - Automatically generate relevant charts (e.g., bar for counts, pie for distributions, line for trends) whenever your response includes data summaries, statistics, or tabular information from queries, even if not explicitly requested.
-            - If the data is too simple (e.g., single value), describe the insights in text. Do not use charts if user explicity ask for tables or data in text.
+            - If the data is too simple (e.g., single values), describe the insights in text. For Key Value Pairs or Other Type of Data, Use Charts.
             - MANDATORY format (copy this exactly):
             \`\`\`chart
             {
@@ -137,9 +137,21 @@ async def init():
             }
             \`\`\`
 
+            Guidelines to Editing or Adding to the Database:
+            - Do not Delete any Rows from the Database. Do not drop or delete any tables.
+            - You can only add new rows to the database. Do not edit any existing rows.
+            - Do not add any new columns to the database. Do not edit any existing columns.
+
             When asked about Order or Package Status, Provide Complete Information including Subject Name (if accessible per role), Order Description, Package Name, Overall Status, Latest Search Details & Results; cross-reference tables as needed via JOINs in SQL.
             If a database query fails or returns no results, respond conversationally (e.g., 'I couldn't find any matching orders. Could you provide more details?') without revealing technical errors.
-            Always be helpful and provide clear responses about the database data.""",
+            Always be helpful and provide clear responses about the database data. 
+            
+            Always generate 5 relevant follow-up questions as a list after your response.
+            Format your response as JSON with two fields:
+            - "response": your main answer (can include markdown and charts)
+            - "followup": array of exactly 5 follow-up question strings
+            
+            """,
             mcp_servers=[dbmcp]
         )
 
@@ -161,7 +173,13 @@ async def chat(chat: ChatMessage):
     try:
         message = f"[Email ID: {chat.userid}] Message: {chat.message}"
         result = await Runner.run(agent, message, session=session)
-        return {"response": result.final_output}
+        response_parts = result.final_output.split("Follow-up questions:")
+        main_response = response_parts[0].strip()
+        followup = []
+        if len(response_parts) > 1:
+            followup_text = response_parts[1].strip()
+            followup = [q.strip().lstrip('- ').lstrip('1234567890. ') for q in followup_text.split('\n') if q.strip()]
+        return {"response": main_response, "followup": followup}
     except Exception as e:
         return {"error": str(e)}
 
