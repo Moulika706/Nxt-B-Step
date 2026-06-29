@@ -1,2 +1,12 @@
 .env
 sessions/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+node_modules/
+.next/
+frontend/.next/
+frontend/node_modules/
+frontend/.turbo/
+frontend/bun.lock

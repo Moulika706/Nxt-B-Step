@@ -21,23 +21,28 @@ Hackathon Repo for VNR Team - Team X - [Deployed Link](https://agent-a-rho.verce
 
 ## Project Overview
 
-**Agent A (Accurate Agent)** is an intelligent background check management system designed for HR professionals and recruitment agencies. This system combines modern web technologies (NextJS) with modern artificial intelligence technologies (MCP) to deliver fast, accurate insights about background verification processes, order statuses, and detailed search results across multiple data dimensions. Built as a hackathon project by Team X for Accurate Background, this system revolutionizes how HR teams interact with background check information.
+**Accurate DecisionOS** is a reusable agentic decision intelligence platform built for the hackathon challenge: Intelligent Next Best Action Platform. It turns customer interactions, operational context, and organizational knowledge into explainable next-best actions with human review and memory.
 
-### Core Problems Solved
-- **Complex Data Queries**: Traditional background check systems require In-Depth SQL knowledge
-- **Time-Consuming Analysis**: HR professionals spend hours manually analyzing background check data and generating insights
-- **Limited Accessibility**: Background check data often exists in silos across different systems, making cross-referencing difficult
-- **Inconsistent Reporting**: Different team members may generate inconsistent reports due to manual analysis processes
+### Hackathon Challenge Alignment
+- **Planner-based orchestration**: a planner agent coordinates reasoning over the incoming case
+- **Reusable architecture**: the same workflow can be adapted to onboarding, customer success, sales, support, or operations
+- **Explainable recommendations**: every suggestion includes reasoning, evidence, and confidence
+- **Human-in-the-loop review**: recommendations can be approved, rejected, or edited before execution
+- **Memory-driven improvement**: prior interactions and review outcomes help improve future recommendations
+
+### Business Problems Solved
+- **Slow response handling**: teams spend too much time interpreting customer issues and deciding next steps
+- **Context scattering**: relevant customer history and policy guidance are often stored in different places
+- **Inconsistent decisions**: different teammates may choose different actions without shared reasoning
+- **Lack of explainability**: recommendations are hard to justify to customers, leads, or reviewers
 
 ### Solution Approach
-- **Natural Language Interface**: Ask complex questions in plain English instead of writing SQL queries or navigating complex interfaces
-- **Role-Based Access Control**: Different user types (admin, company, subject) see only relevant data with proper security boundaries
-- **Intelligent Data Analysis**: AI automatically generates charts, graphs, and insights from complex background check datasets
-- **Real-Time Insights**: Instant access to background check statuses, progress tracking, and detailed search results
-- **Personalized Ques**: The AI interface provides ready-to-use prompts personalized to user and reduces learning curve.
-- **Smart Follow-ups**: The agent intelligently suggests relevant next questions based on conversation context and data patterns
-- **Unified Data Access**: Single interface to access all background check information across different tables and relationships
-- **Modern Web Interface**: Intuitive, responsive design that works seamlessly across devices and browsers
+- **Natural language intake**: users can paste emails, meeting notes, CRM updates, or support escalations
+- **Context gathering**: the planner pulls in operational data and relevant knowledge sources
+- **Decision analysis**: risks, opportunities, and missing information are surfaced clearly
+- **Action generation**: the platform suggests the next best action with supporting evidence
+- **Review workflow**: human reviewers can approve or refine recommendations before they are acted on
+- **Portable design**: the same architecture can be reused for different B2B domains beyond background checks
 
 ## Installation & Setup
 

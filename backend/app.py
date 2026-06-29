@@ -1,204 +1,178 @@
 import os
 import asyncio, sys, json
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
-from agents.mcp.server import MCPServerStdio
-from agents import Agent, Runner, SQLiteSession
+import requests
+
+from decision_platform import init_decision_tables, review_recommendation, run_decision_workflow
 
 load_dotenv()
 
 agent = None
+HF_API_TOKEN = os.getenv("HF_API_TOKEN", "")
+HF_MODEL = os.getenv("HF_MODEL", "microsoft/Phi-3.5-mini-instruct")
+HF_API_URL = f"https://api-inference.huggingface.co/models/{HF_MODEL}"
 
 class ChatMessage(BaseModel):
     message: str
     sessionid: str
     userid: str
 
+class DecisionRequest(BaseModel):
+    interaction: str
+    userid: str = "guest@accurate.ai"
+    sessionid: str | None = None
+
+class RecommendationReview(BaseModel):
+    recommendation_id: str
+    status: str
+    note: str | None = None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    agent = await init()
+    init_decision_tables()
     yield
 
-app = FastAPI(title="Accurate AI", lifespan=lifespan)
+
+app = FastAPI(title="Accurate DecisionOS", lifespan=lifespan)
 
 async def init():
-    global agent
+    return True
 
-    server_path = os.path.join(os.path.dirname(__file__), "server.py")
 
-    dbmcp = MCPServerStdio(
-        name="Accurate DB Server",
-        params={
-            "command": sys.executable,
-            "args": [server_path, "--server_type=stdio"]
-        }
-    )
-    
+def call_huggingface(prompt: str) -> str:
+    if not HF_API_TOKEN:
+        return "Hugging Face token is not configured. Set HF_API_TOKEN before running the app."
+
+    headers = {"Authorization": f"Bearer {HF_API_TOKEN}"}
+    payload = {
+        "inputs": prompt,
+        "parameters": {
+            "max_new_tokens": 250,
+            "temperature": 0.7,
+            "return_full_text": False,
+        },
+    }
+
     try:
-        await dbmcp.connect()
-        
-        agent = Agent(
-            name="Accurate Agent",
-            model="gpt-4.1-2025-04-14",
-            instructions="""
-            You are the Accurate Chatbot, an expert AI assistant for HR and recruitment professionals. 
-            Your primary purpose is to provide fast and accurate information about background check orders by querying a SQLite database.
+        response = requests.post(HF_API_URL, headers=headers, json=payload, timeout=60)
+        response.raise_for_status()
+        data = response.json()
 
-            You are helpful, precise, and an expert on the background check lifecycle.
-            - Query the Database using the querydb tool
-            - Get table names using get_tables tool & Get table schemas using get_schema tool
+        if isinstance(data, list) and data:
+            if isinstance(data[0], dict) and "generated_text" in data[0]:
+                return data[0]["generated_text"].strip()
 
-            First, understand the user's intent. Second, identify the necessary tables and columns. Third, construct the correct SQL query.
-            Do not mention about the Database to the User. You are Accurate AI, a background check expert assistant.
-            Finally, interpret the query result and provide a clear, conversational answer. You can use Markdown for tables, charts.
+        if isinstance(data, dict) and "generated_text" in data:
+            return data["generated_text"].strip()
 
-            The user's message will be prefixed with [Email ID: emailid]. Extract this emailid and query the users table to determine their, userid(subject_id or comp_id) role and access permissions.
-            First, always query: SELECT userid, role, name, email FROM users WHERE emailid = 'extracted_emailid' to get the user's userid(subject_id or comp_id), role, name and email.
-            If the user is not found in the users table, Ask them their Name, Role, UserID and EmailID and Add them to the users table.
-            Then apply these filters in your SQL queries based on the role:
-            - For 'admin' role: No additional filtering required - full access to all data
-            - For 'company' role: Query SELECT comp_code FROM company WHERE comp_id = 'user_id' to get company code, then add WHERE clause filtering by order_companycode = 'retrieved_comp_code'
-            - For 'subject' role: Query SELECT subject_id FROM subject WHERE subject_id = 'user_id' to get subject ID, then add WHERE clause filtering by order_subjectid = retrieved_subject_id OR subject_id = retrieved_subject_id
-            When responding, Do not mention the User ID or Role prefix in your response to the user. Start Conversation with: "Hello [retrieved_name], how can I help you?" then answer the question for the first time.
-            
-            Here are database ideas so you can navigate the database: Database Schema
-            users
-                - userid (TEXT PRIMARY KEY): Unique identifier for all kind of users.
-                - name (TEXT): Name of the user (admin name or company name or subject name)
-                - role (TEXT): Role of the user ('admin', 'company', or 'subject')
-                - email (TEXT): Email ID of the user UNIQUE
-            company
-                - comp_id (INTEGER PRIMARY KEY): Unique ID for a client company.
-                - comp_name (TEXT): The name of the client company.
-                - comp_code (TEXT UNIQUE): Short code for the company.
-            subject
-                - subject_id (INTEGER PRIMARY KEY): Unique ID for a subject.
-                - subject_name (TEXT): The name of the subject.
-                - subject_alias (TEXT): The alias of the subject.
-                - subject_contact (TEXT): The contact information of the subject.
-                - subject_address1 (TEXT): The address of the subject.
-                - subject_address2 (TEXT): The address of the subject.
-                - sbj_city (TEXT): The city of the subject.
-            package
-                - package_code (INTEGER PRIMARY KEY): Unique ID for a screening package.
-                - package_name (TEXT): The name of the package, e.g., 'General Package'.
-                - package_price (REAL): Cost of the package.
-                - comp_code (TEXT): Foreign key linking to company.comp_code.
-            search_status
-                - status_code (TEXT PRIMARY KEY): Short code for status (e.g., 'C', 'P').
-                - status (TEXT): Description of the status (e.g., 'CANCELLED', 'PENDING').
-            search_type
-                - search_type_code (TEXT PRIMARY KEY): Short code for search type (e.g., 'MVR', 'EMP').
-                - search_type (TEXT): Description of the search type (e.g., 'MOTOR VEHICLE REPORT').
-                - search_type_category (TEXT): Category of the search (e.g., 'G', 'CRI').
-            order_request
-                - order_id (INTEGER PRIMARY KEY): Unique ID for an order.
-                - order_packageid (TEXT UNIQUE): Package ID string for the order.
-                - order_subjectid (INTEGER): Foreign key linking to subject.subject_id.
-                - order_companycode (TEXT): Foreign key linking to company.comp_code.
-                - order_status (TEXT): Foreign key linking to search_status.status_code (e.g., 'P' for PENDING).
-                - order_packagecode (INTEGER): Foreign key linking to package.package_code.
-                - FOREIGN KEY (order_subjectid) REFERENCES subject(subject_id),
-                - FOREIGN KEY (order_companycode) REFERENCES company(comp_code),
-                - FOREIGN KEY (order_status) REFERENCES search_status(status_code),
-                - FOREIGN KEY (order_packagecode) REFERENCES package(package_code)
-            search
-                - searchid (INTEGER PRIMARY KEY): Unique ID for a single search/component.
-                - package_req_id (TEXT): Foreign key linking to order_request.order_packageid.
-                - subject_id (INTEGER): Foreign key linking to subject.subject_id.
-                - search_type_code (TEXT): Foreign key linking to search_type.search_type_code.
-                - search_status (TEXT): Foreign key linking to search_status.status_code.
-                - county_name (TEXT): County for the search.
-                - state_code (TEXT): State code for the search.
-                - pkg_code (INTEGER): Foreign key linking to package.package_code.
-                - sub_status (TEXT): Sub-status details (e.g., 'Discrepancy Found').
-                - FOREIGN KEY (package_req_id) REFERENCES order_request(order_packageid),
-                - FOREIGN KEY (subject_id) REFERENCES subject(subject_id),
-                - FOREIGN KEY (search_type_code) REFERENCES search_type(search_type_code),
-                - FOREIGN KEY (search_status) REFERENCES search_status(status_code),
-                - FOREIGN KEY (pkg_code) REFERENCES package(package_code)
-            Use JOINs appropriately for related data (e.g., JOIN order_request with subject on order_subjectid = subject_id); avoid SELECT * for efficiency; always include role-based WHERE clauses to enforce access.
-
-            ALWAYS create interactive charts using the special 'chart' code block format when presenting data or need to describe data in responses or when users ask for charts unless there is no explicit need
-            For Charts and Data Visualizations : Required for Admin & Companies to Visualize Data.
-            - NEVER just describe charts - ALWAYS generate the actual chart code block
-            - Supported chart types: 'bar', 'line', 'pie', 'area', 'scatter'
-            - Automatically generate relevant charts (e.g., bar for counts, pie for distributions, line for trends) whenever your response includes data summaries, statistics, or tabular information from queries, even if not explicitly requested.
-            - If the data is too simple (e.g., single values), describe the insights in text. For Key Value Pairs or Other Type of Data, Use Charts.
-            - MANDATORY format (copy this exactly):
-            \`\`\`chart
-            {
-                "type": "bar",
-                "title": "Your Chart Title",
-                "data": [
-                {"name": "Category1", "value": 100},
-                {"name": "Category2", "value": 200}
-                ]
-            }
-            \`\`\`
-
-            Guidelines to Editing or Adding to the Database:
-            - Do not Delete any Rows from the Database. Do not drop or delete any tables.
-            - You can only add new rows to the database. Do not edit any existing rows.
-            - Do not add any new columns to the database. Do not edit any existing columns.
-
-            When asked about Order or Package Status, Provide Complete Information including Subject Name (if accessible per role), Order Description, Package Name, Overall Status, Latest Search Details & Results; cross-reference tables as needed via JOINs in SQL.
-            If a database query fails or returns no results, respond conversationally (e.g., 'I couldn't find any matching orders. Could you provide more details?') without revealing technical errors.
-            Always be helpful and provide clear responses about the database data. 
-            
-            Always generate 5 relevant follow-up questions from users point of view as a list after your response.
-            Make sure to format your response as JSON with two fields:
-            - "response": your main answer (can include markdown and charts)
-            - "followup": array of exactly 5 follow-up question strings
-            
-            """,
-            mcp_servers=[dbmcp]
-        )
-
-        return True
-            
+        return str(data)
     except Exception as e:
-        print(f"Error initializing agent: {e}")
-        return False
+        return f"Hugging Face request failed: {str(e)}"
+
+
+def local_fallback_response(message: str, user_email: str) -> dict[str, object]:
+    lowered = message.lower()
+    if any(word in lowered for word in ["status", "pending", "delay", "discrepancy", "risk"]):
+        return {
+            "message": "The planner can help surface pending blockers, discrepancies, and the next best action for the current case.",
+            "followup": [
+                "Show me the current risks",
+                "What should I do next for this order?",
+                "Summarize the latest blockers",
+            ],
+        }
+
+    return {
+        "message": f"Hello {user_email.split('@')[0]}, the local decision workflow is available and ready for review.",
+        "followup": [
+            "Run the planner for this interaction",
+            "Show me the latest risks",
+            "What actions should I take next?",
+        ],
+    }
+
+
+def _fallback_chat_response(message: str, user_email: str):
+    lowered = message.lower()
+
+    if any(word in lowered for word in ["status", "pending", "delay", "discrepancy", "risk"]):
+        return {
+            "message": "I can help review the current case and surface the next best action. The planner can identify pending searches, discrepancies, and recommended follow-up steps.",
+            "followup": [
+                "Show me the current risks",
+                "What should I do next for this order?",
+                "Summarize the latest blockers",
+            ],
+        }
+
+    return {
+        "message": f"Hello {user_email.split('@')[0]}, I can help review decisions and next-best actions for this workflow.",
+        "followup": [
+            "Run the planner for this interaction",
+            "Show me the latest risks",
+            "What actions should I take next?",
+        ],
+    }
+
 
 @app.post("/chat")
 async def chat(chat: ChatMessage):
-    global agent
-    sesspath = os.path.join(os.path.dirname(__file__), "sessions")
-    os.makedirs(sesspath, exist_ok=True)
-    sqpath = os.path.join(sesspath, f"{chat.sessionid}.db")
-    session = SQLiteSession(chat.sessionid, sqpath)
-    if not agent:
-        return {"error": "Agent not initialized"}
     try:
-        message = f"[Email ID: {chat.userid}] Message: {chat.message}"
-        result = await Runner.run(agent, message, session=session)
-        try:
-            parsed = json.loads(result.final_output)
-            return {
-                "message": parsed.get("response", ""),
-                "followup": parsed.get("followup", [])
-            }
-        except json.JSONDecodeError:
-            response_parts = result.final_output.split("Follow-up questions:")
-            main_response = response_parts[0].strip()
-            followup = []
-            if len(response_parts) > 1:
-                followup_text = response_parts[1].strip()
-                followup = [q.strip().lstrip('- ').lstrip('1234567890. ') for q in followup_text.split('\n') if q.strip()]
-            return {"message": main_response, "followup": followup}
+        prompt = f"""
+You are a helpful assistant for a decision platform.
+User message: {chat.message}
+
+Reply briefly, clearly, and helpfully.
+"""
+        reply = call_huggingface(prompt)
+
+        if reply.startswith("Hugging Face request failed"):
+            return local_fallback_response(chat.message, chat.userid)
+
+        return {
+            "message": reply,
+            "followup": [
+                "Show me the current risks",
+                "What should I do next for this order?",
+                "Summarize the latest blockers",
+            ],
+        }
     except Exception as e:
         return {"error": str(e)}
 
+
+@app.post("/decision/run")
+async def decision_run(request: DecisionRequest):
+    if not request.interaction.strip():
+        raise HTTPException(status_code=400, detail="interaction is required")
+
+    try:
+        return run_decision_workflow(
+            content=request.interaction,
+            user_email=request.userid,
+            session_id=request.sessionid,
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/decision/review")
+async def decision_review(request: RecommendationReview):
+    try:
+        return review_recommendation(
+            recommendation_id=request.recommendation_id,
+            status=request.status,
+            note=request.note,
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/")
 async def root():
-    return {"message": "Accurate AI Working!"}
-
-if __name__ == "__main__":
-    import uvicorn
-    try:
-        uvicorn.run(app, host="0.0.0.0", port=8000)
-    except KeyboardInterrupt:
-        pass
+    return {"message": "Accurate DecisionOS Working!"}
