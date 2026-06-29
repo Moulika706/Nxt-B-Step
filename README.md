@@ -3,7 +3,7 @@
 ## Team Details
 
 - Team name: AgentForge
-- Team Members: B.Moulika,B.Sravani, B.Keerthana
+- Team Members:B.Moulika, B.Sravani, B.Keerthana
 - Project: Intelligent Next Best Action Platform
 - Hackathon submission date: 29 June 2026
 
@@ -12,6 +12,25 @@
 Nxt-B-Step is an agentic decision intelligence platform for business users working with staffing and background screening cases. The platform takes a customer interaction, retrieves relevant operational context, applies policy/playbook knowledge, identifies business risks, and generates ranked next-best-action recommendations with confidence, reasoning, and supporting evidence.
 
 The submitted implementation focuses on a background screening scenario where teams need to decide how to respond to pending searches, discrepancies, onboarding blockers, and customer escalations. The same architecture can be reused for customer success, sales operations, support, compliance, and other decision-heavy workflows.
+
+## Reusable Agentic Platform
+
+This is implemented as a reusable agentic platform rather than a one-off chatbot. The system uses a planner-based workflow with specialized agents for ingestion, context retrieval, knowledge matching, risk analysis, recommendation generation, human review, and memory.
+
+The background screening workflow is one domain configuration of the platform. To reuse it for another business process, a team can swap in a different data schema, playbook set, signal extraction rules, and recommendation templates while keeping the same core agentic workflow.
+
+Reusable platform flow:
+
+```text
+Business interaction
+  -> extract signals
+  -> retrieve enterprise context
+  -> match policies and playbooks
+  -> reason over risks and opportunities
+  -> generate ranked next-best actions
+  -> collect human review
+  -> store decision memory
+```
 
 ## Main Capabilities
 
@@ -49,27 +68,28 @@ Frontend:
 
 ## Folder Structure
 
-XLV/
-├── backend/
-│   ├── app.py              # FastAPI application
-│   ├── decision_platform.py # Core agent orchestration logic
-│   ├── server.py           # MCP database server
-│   ├── requirements.txt    # Python dependencies
-│   └── accurate.db         # SQLite database (auto-generated)
-├── frontend/
-│   ├── app/
-│   │   ├── api/            # API route handlers
-│   │   │   ├── decision/   # Decision workflow endpoints
-│   │   │   └── chat/       # Chat endpoint
-│   │   ├── page.tsx        # Main page
-│   │   └── layout.tsx      # Root layout
-│   ├── components/
-│   │   ├── decision/       # Decision workspace component
-│   │   └── ui/             # shadcn/ui components
-│   ├── package.json        # Node dependencies
-│   └── tailwind.config.ts  # Tailwind configuration
-├── .gitignore
-└── README.md
+```text
+backend/
+  app.py
+  decision_platform.py
+  requirements.txt
+  seed_data.py
+  server.py
+
+frontend/
+  app/
+  components/
+  hooks/
+  lib/
+  package.json
+  package-lock.json
+  tailwind.config.ts
+  tsconfig.json
+
+old/
+playground/
+README.md
+```
 
 ## Setup Instructions
 
@@ -165,6 +185,7 @@ http://localhost:3000
 
 ## Important Notes
 
+- The demo video folder was intentionally skipped for this submission package as requested.
 - Dependency and environment folders such as `node_modules`, `.venv`, `.next`, and Python cache folders are excluded from `SourceCode.zip`.
 - The main deterministic next-best-action workflow does not require a Hugging Face token.
 - The optional chat path can use `HF_TOKEN` if a Hugging Face-hosted model is configured.
