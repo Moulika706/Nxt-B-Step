@@ -1,23 +1,21 @@
 import os
-import asyncio
 import sqlite3
 from mcp.server.fastmcp import FastMCP
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "accurate.db")
 
 mcp = FastMCP("Accurate DB Server")
 
 def getconn():
-    dbpath = os.path.join(os.path.dirname(__file__), "accurate.db")
-    conn = sqlite3.connect(dbpath)
+    conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
     return conn
 
-@mcp.tool()
 def querydb(sql: str) -> str:
     try:
         conn = getconn()
         cursor = conn.cursor()
         cursor.execute(sql)
-        
         if sql.strip().upper().startswith('SELECT'):
             results = cursor.fetchall()
             return str([dict(row) for row in results])
@@ -29,13 +27,23 @@ def querydb(sql: str) -> str:
     finally:
         conn.close()
 
-@mcp.tool()
 def get_tables() -> str:
     return querydb("SELECT name FROM sqlite_master WHERE type='table'")
 
-@mcp.tool()
 def get_schema(table_name: str) -> str:
     return querydb(f"PRAGMA table_info({table_name})")
+
+@mcp.tool()
+def querydb_tool(sql: str) -> str:
+    return querydb(sql)
+
+@mcp.tool()
+def get_tables_tool() -> str:
+    return get_tables()
+
+@mcp.tool()
+def get_schema_tool(table_name: str) -> str:
+    return get_schema(table_name)
 
 if __name__ == "__main__":
     mcp.run()
