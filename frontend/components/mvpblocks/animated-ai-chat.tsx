@@ -22,7 +22,7 @@ import {
 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import * as React from "react"
-import { useAuth, useUser } from '@clerk/nextjs'
+import { useDemo } from '@/components/auth/demo-auth-context'
 import { AuthButtons } from '@/components/auth/auth-buttons'
 import { AuthPopup } from '@/components/auth/auth-popup'
 import ChartRenderer from '@/components/ui/chart-renderer'
@@ -151,8 +151,7 @@ interface ChatSession {
 }
 
 export default function AnimatedAIChat() {
-  const { isSignedIn } = useAuth()
-  const { user } = useUser()
+  const { user, isSignedIn, openSignIn } = useDemo()
   const [value, setValue] = useState("")
   const [attachments, setAttachments] = useState<string[]>([])
   const [isPending, startTransition] = useTransition()
@@ -165,7 +164,7 @@ export default function AnimatedAIChat() {
   const [editingChatId, setEditingChatId] = useState<string | null>(null)
   const [editingName, setEditingName] = useState("")
   const [showAuthPopup, setShowAuthPopup] = useState(false)
-  const [isGuestMode, setIsGuestMode] = useState(false)
+  const [isGuestMode, setIsGuestMode] = useState(true)
   const [isThinking, setIsThinking] = useState(false)
   const [followupQuestions, setFollowupQuestions] = useState<string[]>([])
   const postTextareaRef = useRef<HTMLTextAreaElement>(null)
@@ -176,8 +175,8 @@ export default function AnimatedAIChat() {
   const [inputFocused, setInputFocused] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
-  // Helper function to check if user can chat
-  const canUserChat = isSignedIn || isGuestMode
+  // Helper function to check if user can chat (always true in demo mode)
+  const canUserChat = true
 
   const handleContinueAsGuest = () => {
     setIsGuestMode(true)
@@ -565,7 +564,7 @@ export default function AnimatedAIChat() {
           body: JSON.stringify({
             message: value.trim(),
             sessionid: isSignedIn ? currentChatId : "session123",
-            userid: isSignedIn && user?.emailAddresses?.[0]?.emailAddress ? user.emailAddresses[0].emailAddress : "8899"  // Use email when signed in, hardcoded for guest
+            userid: user?.email ?? "guest@accurate.ai"  // Use demo user email
           })
         })
           .then(response => response.json())
@@ -685,7 +684,7 @@ export default function AnimatedAIChat() {
           body: JSON.stringify({
             message: postMessageValue.trim(),
             sessionid: isSignedIn ? currentChatId : "session123",
-            userid: isSignedIn && user?.emailAddresses?.[0]?.emailAddress ? user.emailAddresses[0].emailAddress : "8899"  // Use email when signed in, hardcoded for guest
+            userid: user?.email ?? "guest@accurate.ai"  // Use demo user email
           })
         })
           .then(response => response.json())

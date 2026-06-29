@@ -1,121 +1,63 @@
 "use client"
 
-import { SignInButton, SignUpButton } from '@clerk/nextjs'
-import { motion, AnimatePresence } from 'framer-motion'
-import { X, User, UserPlus } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from "framer-motion"
+import { X, Shield } from "lucide-react"
+import { useDemo } from "@/components/auth/demo-auth-context"
 
 interface AuthPopupProps {
   isOpen: boolean
   onClose: () => void
-  onContinueAsGuest?: () => void
-  title?: string
-  description?: string
+  onContinueAsGuest: () => void
 }
 
-export function AuthPopup({ 
-  isOpen, 
-  onClose, 
-  onContinueAsGuest,
-  title = "Authentication Required",
-  description = "Please sign in or sign up to continue using the chat." 
-}: AuthPopupProps) {
+export function AuthPopup({ isOpen, onClose, onContinueAsGuest }: AuthPopupProps) {
+  const { openSignIn } = useDemo()
+
+  const handleSignIn = () => {
+    onClose()
+    openSignIn()
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-          />
-
-          {/* Popup */}
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden"
           >
-            <motion.div
-              className="w-full max-w-md bg-card/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: "spring", duration: 0.3 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/10">
-                <h2 className="text-xl font-semibold text-foreground">{title}</h2>
-                <motion.button
-                  onClick={onClose}
-                  className="p-2 rounded-lg hover:bg-white/10 transition-colors"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <X className="h-5 w-5 text-muted-foreground" />
-                </motion.button>
+            <div className="bg-slate-950 px-6 py-5 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Shield className="h-5 w-5 text-teal-400" />
+                <h2 className="text-white font-semibold">Sign In Required</h2>
               </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <p className="text-muted-foreground mb-8 text-center leading-relaxed">
-                  {description}
-                </p>
-
-                {/* Auth Buttons */}
-                <div className="space-y-3">
-                  <SignInButton mode="modal">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-card/30 backdrop-blur-xl border border-white/20 hover:border-white/30 hover:bg-card/50 text-foreground font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-                    >
-                      <User className="h-5 w-5" />
-                      Sign In
-                    </motion.button>
-                  </SignInButton>
-
-                  <SignUpButton mode="modal">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      className="w-full flex items-center justify-center gap-3 px-6 py-3 rounded-xl bg-card/30 backdrop-blur-xl border border-white/20 hover:border-white/30 hover:bg-card/50 text-foreground font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
-                    >
-                      <UserPlus className="h-5 w-5" />
-                      Sign Up
-                    </motion.button>
-                  </SignUpButton>
-                </div>
-
-                {/* Divider */}
-                <div className="relative my-8">
-                  <div className="flex items-center text-xs uppercase tracking-wide">
-                    <div className="flex-1 border-t border-white/20"></div>
-                    <span className="bg-card/30 backdrop-blur-xl px-6 py-2 mx-4 text-muted-foreground rounded-full border border-white/20">
-                      or continue as guest
-                    </span>
-                    <div className="flex-1 border-t border-white/20"></div>
-                  </div>
-                </div>
-
-                {/* Guest Option */}
-                <motion.button
-                  onClick={onContinueAsGuest || onClose}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full px-6 py-3 rounded-xl bg-card/30 backdrop-blur-xl border border-white/20 hover:border-white/30 hover:bg-card/50 text-muted-foreground hover:text-foreground font-medium transition-all duration-200 shadow-lg hover:shadow-xl"
+              <button onClick={onClose} className="text-slate-400 hover:text-white transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-slate-600 text-sm leading-relaxed">
+                Sign in to access personalized background check data based on your role.
+              </p>
+              <div className="space-y-2">
+                <button
+                  onClick={handleSignIn}
+                  className="w-full py-2.5 bg-slate-950 text-white rounded-lg text-sm font-medium hover:bg-slate-800 transition-colors"
+                >
+                  Sign In
+                </button>
+                <button
+                  onClick={onContinueAsGuest}
+                  className="w-full py-2.5 border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:bg-slate-50 transition-colors"
                 >
                   Continue as Guest
-                </motion.button>
+                </button>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
-        </>
+        </div>
       )}
     </AnimatePresence>
   )
