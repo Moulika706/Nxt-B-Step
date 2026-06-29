@@ -185,8 +185,6 @@ http://localhost:3000
 
 ## Important Notes
 
-- The demo video folder was intentionally skipped for this submission package as requested.
-- Dependency and environment folders such as `node_modules`, `.venv`, `.next`, and Python cache folders are excluded from `SourceCode.zip`.
 - The main deterministic next-best-action workflow does not require a Hugging Face token.
 - The optional chat path can use `HF_TOKEN` if a Hugging Face-hosted model is configured.
 - The backend creates decision intelligence tables on startup and stores new workflow/review events in SQLite.
