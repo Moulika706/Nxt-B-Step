@@ -11,10 +11,10 @@ The implementation is split into a Python FastAPI backend and a Next.js frontend
 ```mermaid
 flowchart LR
     user["Business User / Reviewer"]
-    ui["Next.js Decision Workspace<br/>React + TypeScript + Tailwind CSS"]
-    api["Next.js API Routes<br/>/api/decision/run<br/>/api/decision/review"]
-    backend["FastAPI Backend<br/>app.py"]
-    planner["Planner-Based Decision Workflow<br/>decision_platform.py"]
+    ui["Next.js Decision Workspace\nReact + TypeScript + Tailwind CSS"]
+    api["Next.js API Routes\n/api/decision/run\n/api/decision/review"]
+    backend["FastAPI Backend\napp.py"]
+    planner["Planner-Based Decision Workflow\ndecision_platform.py"]
     ingest["Interaction Ingestion Agent"]
     context["Customer Context Agent"]
     knowledge["Knowledge Retrieval Agent"]
@@ -22,9 +22,9 @@ flowchart LR
     rec["Recommendation Agent"]
     review["Human Review Agent"]
     memory["Memory Agent"]
-    db["SQLite Database<br/>Operational Data + Decision Tables"]
-    kb["In-Code Knowledge Base<br/>Playbooks + Policies"]
-    mcp["MCP Database Helper<br/>server.py"]
+    db["SQLite Database\nOperational Data + Decision Tables"]
+    kb["Knowledge Base\nPlaybooks + Policies"]
+    mcp["MCP Database Helper\nserver.py"]
     hf["Optional Hugging Face Chat API"]
 
     user --> ui
@@ -45,7 +45,7 @@ flowchart LR
     knowledge <--> kb
     backend <--> mcp
     mcp <--> db
-    backend -. optional chat .-> hf
+    backend -. Optional Chat .-> hf
 
     rec --> api
     api --> ui
