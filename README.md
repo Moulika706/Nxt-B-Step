@@ -49,28 +49,27 @@ Frontend:
 
 ## Folder Structure
 
-```text
-backend/
-  app.py
-  decision_platform.py
-  requirements.txt
-  seed_data.py
-  server.py
-
-frontend/
-  app/
-  components/
-  hooks/
-  lib/
-  package.json
-  package-lock.json
-  tailwind.config.ts
-  tsconfig.json
-
-old/
-playground/
-README.md
-```
+XLV/
+├── backend/
+│   ├── app.py              # FastAPI application
+│   ├── decision_platform.py # Core agent orchestration logic
+│   ├── server.py           # MCP database server
+│   ├── requirements.txt    # Python dependencies
+│   └── accurate.db         # SQLite database (auto-generated)
+├── frontend/
+│   ├── app/
+│   │   ├── api/            # API route handlers
+│   │   │   ├── decision/   # Decision workflow endpoints
+│   │   │   └── chat/       # Chat endpoint
+│   │   ├── page.tsx        # Main page
+│   │   └── layout.tsx      # Root layout
+│   ├── components/
+│   │   ├── decision/       # Decision workspace component
+│   │   └── ui/             # shadcn/ui components
+│   ├── package.json        # Node dependencies
+│   └── tailwind.config.ts  # Tailwind configuration
+├── .gitignore
+└── README.md
 
 ## Setup Instructions
 
