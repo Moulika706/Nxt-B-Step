@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from mcp.server.fastmcp import FastMCP
+
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "accurate.db")
 

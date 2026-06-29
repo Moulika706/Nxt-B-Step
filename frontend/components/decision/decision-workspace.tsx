@@ -1,3 +1,4 @@
+
 "use client"
 
 import type React from "react"
@@ -6,6 +7,8 @@ import {
   AlertTriangle,
   Brain,
   Check,
+  ChevronDown,
+  ChevronRight,
   ClipboardList,
   Database,
   FileSearch,
@@ -19,6 +22,7 @@ import {
   Target,
   X,
 } from "lucide-react"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 
 type TraceItem = {
   agent: string
@@ -124,12 +128,53 @@ function DataBars({ data }: { data: Array<{ name: string; value: number }> }) {
   )
 }
 
+function CollapsibleSection({
+  title,
+  icon: Icon,
+  isOpen,
+  onToggle,
+  children,
+  className = "",
+}: {
+  title: string
+  icon: React.ComponentType<{ className?: string }>
+  isOpen: boolean
+  onToggle: () => void
+  children: React.ReactNode
+  className?: string
+}) {
+  return (
+    <Collapsible open={isOpen} onOpenChange={onToggle} className={`rounded-md border border-slate-200 bg-white shadow-sm ${className}`}>
+      <CollapsibleTrigger asChild>
+        <button className="flex w-full items-center justify-between p-4 text-left hover:bg-slate-50 transition">
+          <div className="flex items-center gap-2">
+            <Icon className="h-4 w-4 text-slate-700" />
+            <h2 className="text-sm font-semibold">{title}</h2>
+          </div>
+          {isOpen ? <ChevronDown className="h-4 w-4 text-slate-500" /> : <ChevronRight className="h-4 w-4 text-slate-500" />}
+        </button>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="px-4 pb-4">
+        {children}
+      </CollapsibleContent>
+    </Collapsible>
+  )
+}
+
 export default function DecisionWorkspace() {
   const [interaction, setInteraction] = useState(demoInteraction)
   const [result, setResult] = useState<DecisionResult | null>(null)
   const [isRunning, setIsRunning] = useState(false)
   const [error, setError] = useState("")
   const [reviewingId, setReviewingId] = useState("")
+  
+  // Collapsible states
+  const [plannerTraceOpen, setPlannerTraceOpen] = useState(true)
+  const [businessAnalysisOpen, setBusinessAnalysisOpen] = useState(true)
+  const [recommendationsOpen, setRecommendationsOpen] = useState(true)
+  const [retrievedContextOpen, setRetrievedContextOpen] = useState(true)
+  const [knowledgeEvidenceOpen, setKnowledgeEvidenceOpen] = useState(true)
+  const [decisionMemoryOpen, setDecisionMemoryOpen] = useState(false)
 
   const userEmail = "guest@accurate.ai"
 
@@ -260,7 +305,6 @@ export default function DecisionWorkspace() {
               onChange={(event) => setInteraction(event.target.value)}
               placeholder="Paste a customer issue, meeting note, CRM update, or support escalation..."
               className="min-h-[260px] w-full resize-none rounded-md border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
-              placeholder="Paste meeting notes, email, CRM update, or customer conversation..."
             />
             <div className="mt-3 flex items-center justify-between gap-3">
               <button
@@ -355,11 +399,12 @@ export default function DecisionWorkspace() {
 
               <div className="grid gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(320px,0.9fr)]">
                 <div className="space-y-5">
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <ClipboardList className="h-4 w-4 text-indigo-700" />
-                      <h2 className="text-sm font-semibold">Planner Trace</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Planner Trace"
+                    icon={ClipboardList}
+                    isOpen={plannerTraceOpen}
+                    onToggle={() => setPlannerTraceOpen(!plannerTraceOpen)}
+                  >
                     <div className="space-y-3">
                       {result.planner_trace.map((item) => (
                         <div key={item.agent} className="rounded-md border border-slate-200 p-3">
@@ -373,25 +418,27 @@ export default function DecisionWorkspace() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <AlertTriangle className="h-4 w-4 text-amber-700" />
-                      <h2 className="text-sm font-semibold">Business Analysis</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Business Analysis"
+                    icon={AlertTriangle}
+                    isOpen={businessAnalysisOpen}
+                    onToggle={() => setBusinessAnalysisOpen(!businessAnalysisOpen)}
+                  >
                     <div className="grid gap-3 md:grid-cols-3">
                       <AnalysisColumn title="Risks" items={result.analysis.risks} />
                       <AnalysisColumn title="Opportunities" items={result.analysis.opportunities} />
                       <AnalysisColumn title="Missing Info" items={result.analysis.missing_information} />
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <Target className="h-4 w-4 text-teal-700" />
-                      <h2 className="text-sm font-semibold">Recommendations for Review</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Recommendations for Review"
+                    icon={Target}
+                    isOpen={recommendationsOpen}
+                    onToggle={() => setRecommendationsOpen(!recommendationsOpen)}
+                  >
                     <div className="space-y-4">
                       {result.recommendations.map((rec) => (
                         <div key={rec.id} className="rounded-md border border-slate-200 p-4">
@@ -447,15 +494,16 @@ export default function DecisionWorkspace() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </CollapsibleSection>
                 </div>
 
                 <aside className="space-y-5">
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <FileSearch className="h-4 w-4 text-sky-700" />
-                      <h2 className="text-sm font-semibold">Retrieved Context</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Retrieved Context"
+                    icon={FileSearch}
+                    isOpen={retrievedContextOpen}
+                    onToggle={() => setRetrievedContextOpen(!retrievedContextOpen)}
+                  >
                     <div className="space-y-3">
                       {result.context.orders.slice(0, 4).map((order) => (
                         <div key={`${order.order_id}`} className="rounded-md bg-slate-50 p-3 text-sm">
@@ -470,7 +518,7 @@ export default function DecisionWorkspace() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
                   <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
                     <div className="mb-4 flex items-center gap-2">
@@ -480,11 +528,12 @@ export default function DecisionWorkspace() {
                     <DataBars data={result.context.status_mix} />
                   </div>
 
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <FileSearch className="h-4 w-4 text-indigo-700" />
-                      <h2 className="text-sm font-semibold">Knowledge Evidence</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Knowledge Evidence"
+                    icon={FileSearch}
+                    isOpen={knowledgeEvidenceOpen}
+                    onToggle={() => setKnowledgeEvidenceOpen(!knowledgeEvidenceOpen)}
+                  >
                     <div className="space-y-3">
                       {result.knowledge.map((item) => (
                         <div key={item.id} className="rounded-md bg-slate-50 p-3">
@@ -494,13 +543,14 @@ export default function DecisionWorkspace() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </CollapsibleSection>
 
-                  <div className="rounded-md border border-slate-200 bg-white p-4 shadow-sm">
-                    <div className="mb-4 flex items-center gap-2">
-                      <History className="h-4 w-4 text-slate-700" />
-                      <h2 className="text-sm font-semibold">Decision Memory</h2>
-                    </div>
+                  <CollapsibleSection
+                    title="Decision Memory"
+                    icon={History}
+                    isOpen={decisionMemoryOpen}
+                    onToggle={() => setDecisionMemoryOpen(!decisionMemoryOpen)}
+                  >
                     {result.context.memory.length ? (
                       <div className="space-y-3">
                         {result.context.memory.map((item, index) => (
@@ -515,7 +565,7 @@ export default function DecisionWorkspace() {
                         Memory will populate as recommendations are generated and reviewed.
                       </p>
                     )}
-                  </div>
+                  </CollapsibleSection>
                 </aside>
               </div>
             </>
